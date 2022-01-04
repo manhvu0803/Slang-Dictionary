@@ -5,20 +5,36 @@ public class Dictionary {
 	public class SlangNotFoundException extends Exception {}
 	public class SlangExistedException extends Exception {}
 
-	Map<String, ArrayList<String>> data;
-
+	Map<String, List<String>> data;
+	
+	@SuppressWarnings("unchecked")
 	Dictionary() throws FileNotFoundException {
 		data = new HashMap<>();
 
+		var file = new File("slang.dat");
+		if (!file.exists())
+			loadDefault();
+		
+		try (var input = new ObjectInputStream(new FileInputStream(file))) {
+			data = (HashMap<String, List<String>>)input.readObject();
+		}
+		catch (Exception e) {
+			System.err.println("Error while reading slang.dat: " + e.getLocalizedMessage() + "\nReading slang.txt instead");
+			loadDefault();
+		}
+	}
+
+	void loadDefault() throws FileNotFoundException {
 		try (var reader = new BufferedReader(new FileReader("Slang.txt"))) {
 			reader.readLine();
 			String line;
 			String last = "";
 			while ((line = reader.readLine()) != null) {
-				String[] items = line.split("`");
+				String[] items = line.split("(`|\\| )");
 				if (items.length > 1) {
 					data.put(items[0], new ArrayList<String>());
-					data.get(items[0]).add(items[1]);
+					for (int i = 1; i < items.length; i++)
+						data.get(items[0]).add(items[i]);
 					last = items[0];
 				}
 				else 
@@ -54,27 +70,19 @@ public class Dictionary {
 		data.put(slang, new ArrayList<>(Arrays.asList(meanings)));
 	}
 
+	public void save() throws IOException {
+		try (var output = new ObjectOutputStream(new FileOutputStream("slang.dat"))) {
+			output.writeObject(data);
+		}
+	}
+	
+	//#region static
 	static Dictionary instance = null;
 
 	public static Dictionary getInstance() throws FileNotFoundException {
-		if (instance != null)
+		if (instance == null)
 			instance = new Dictionary();
 		return instance;
 	}
-
-	public static void main(String args[]) throws Exception {
-		var dict = new Dictionary();
-		var keys = dict.data.keySet().toArray();
-		
-		//int start = 0, end = Math.min(10, keys.length);
-		for (int i = 0; i < keys.length; i++) {
-			var data = dict.data.get(keys[i]);
-			if (data.size() > 1) {
-				System.out.print(keys[i] + ": ");
-				for (String str: data)
-					System.out.print(str + ", ");
-				System.out.println();
-			}
-		}
-	}
+	//#endregion
 }
