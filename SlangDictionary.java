@@ -19,7 +19,7 @@ public class SlangDictionary implements Closeable {
 		}
 		
 		try (var input = new ObjectInputStream(new FileInputStream(file))) {
-			data = (HashMap<String, List<String>>)input.readObject();
+			data = (TreeMap<String, List<String>>)input.readObject();
 		}
 		catch (Exception e) {
 			System.err.println("Error while reading " + dataFile + ": " + e.getLocalizedMessage());
@@ -36,7 +36,7 @@ public class SlangDictionary implements Closeable {
 			while ((line = reader.readLine()) != null) {
 				String[] items = line.split("(`|\\| )");
 				if (items.length > 1) {
-					data.put(items[0], new ArrayList<String>());
+					data.put(items[0], new ArrayList<String>(5));
 					for (int i = 1; i < items.length; i++)
 						data.get(items[0]).add(items[i]);
 					last = items[0];
