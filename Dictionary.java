@@ -2,9 +2,12 @@ import java.io.*;
 import java.util.*;
 
 public class Dictionary {
+	public class SlangNotFoundException extends Exception {}
+	public class SlangExistedException extends Exception {}
+
 	Map<String, ArrayList<String>> data;
 
-	public Dictionary() throws FileNotFoundException, IOException {
+	Dictionary() throws FileNotFoundException {
 		data = new HashMap<>();
 
 		try (var reader = new BufferedReader(new FileReader("Slang.txt"))) {
@@ -22,6 +25,41 @@ public class Dictionary {
 					data.get(last).add(items[0]);
 			}
 		}
+		catch (IOException e) {
+			System.err.println("Error while parsing dictionary: " + e.getLocalizedMessage());
+		}
+	}
+
+	public List<String> getMeaning(String slang) {
+		return data.get(slang);
+	}
+
+	public void addMeaning(String slang, String meaning) throws SlangNotFoundException {
+		var meanings = data.get(slang);
+		if (meanings == null) 
+			throw new SlangNotFoundException();
+		meanings.add(meaning);
+	}
+
+	public void deleteMeaning(String slang, int pos) throws SlangNotFoundException {
+		var meanings = data.get(slang);
+		if (meanings == null)
+			throw new SlangNotFoundException();
+		meanings.remove(pos);
+	}
+
+	public void addSlang(String slang, String[] meanings) throws SlangExistedException {
+		if (data.get(slang) != null)
+			throw new SlangExistedException();
+		data.put(slang, new ArrayList<>(Arrays.asList(meanings)));
+	}
+
+	static Dictionary instance = null;
+
+	public static Dictionary getInstance() throws FileNotFoundException {
+		if (instance != null)
+			instance = new Dictionary();
+		return instance;
 	}
 
 	public static void main(String args[]) throws Exception {
