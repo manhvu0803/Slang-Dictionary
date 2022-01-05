@@ -70,13 +70,13 @@ public class SlangDictionary implements Closeable {
 		return slangs;
 	}
 	
-	public Map<String, String> getRandomSlangMeaning(int number) {
+	public List<String[]> getRandomSlangMeaning(int number) {
 		var slangs = getRandomSlangs(number);
 		var generator = new Random();
-		var slangMap = new HashMap<String, String>();
+		var slangMap = new ArrayList<String[]>();
 		for (var slang: slangs) {
 			var mns = getMeanings(slang).toArray(new String[0]);
-			slangMap.put(slang, mns[generator.nextInt(mns.length)]);
+			slangMap.add(new String[]{slang, mns[generator.nextInt(mns.length)]});
 		}
 		return slangMap;
 	}

@@ -13,12 +13,12 @@ public class Gui extends JFrame {
 
 		JTabbedPane tabPane = new JTabbedPane();
 		tabPane.addTab("Dictionary", new DictionaryPane(dict));
-		tabPane.addTab("Quiz", new JPanel());
+		tabPane.addTab("Quiz", new QuizPane(dict));
 
 		add(tabPane, BorderLayout.CENTER);
 
 		pack();
-		setMinimumSize(new Dimension(400, getHeight() + 150));
+		setMinimumSize(new Dimension(500, getHeight() + 150));
 		setLocationRelativeTo(null);
 		setVisible(true);
 
