@@ -47,12 +47,35 @@ public class SlangDictionary implements Closeable {
 		}
 	}
 
-	public List<String> getMeaning(String slang) {
+	public Collection<String> getMeanings(String slang) {
 		return data.get(slang);
 	}
 
-	public Set<String> getAllSlangs() {
+	public Collection<String> getAllSlangs() {
 		return data.keySet();
+	}
+
+	public Collection<String> getRandomSlangs(int number) {
+		var slangs = new HashSet<String>();
+		var keys = getAllSlangs().toArray(new String[0]);
+		var generator = new Random();
+		number = Math.min(number, keys.length);
+		while (slangs.size() < number && number <= keys.length) {
+			int pos = generator.nextInt(keys.length);
+			slangs.add(keys[pos]);
+		}
+		return slangs;
+	}
+	
+	public Map<String, String> getRandomSlangMeaning(int number) {
+		var slangs = getRandomSlangs(number);
+		var generator = new Random();
+		var slangMap = new HashMap<String, String>();
+		for (var slang: slangs) {
+			var mns = getMeanings(slang).toArray(new String[0]);
+			slangMap.put(slang, mns[generator.nextInt(mns.length)]);
+		}
+		return slangMap;
 	}
 
 	public void addMeaning(String slang, String meaning) throws SlangNotFoundException {
