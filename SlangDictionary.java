@@ -2,8 +2,11 @@ import java.io.*;
 import java.util.*;
 
 public class SlangDictionary implements Closeable {
-	public class SlangNotFoundException extends Exception {}
-	public class SlangExistedException extends Exception {}
+	public class SlangException extends Exception {
+		public SlangException(String argument) {
+			super(argument);
+		}
+	}
 
 	Map<String, List<String>> data;
 	
@@ -47,7 +50,7 @@ public class SlangDictionary implements Closeable {
 		}
 	}
 
-	public Collection<String> getMeanings(String slang) {
+	public List<String> getMeanings(String slang) {
 		return data.get(slang);
 	}
 
@@ -78,24 +81,33 @@ public class SlangDictionary implements Closeable {
 		return slangMap;
 	}
 
-	public void addMeaning(String slang, String meaning) throws SlangNotFoundException {
+	public void addMeaning(String slang, String meaning) throws SlangException {
 		var meanings = data.get(slang);
-		if (meanings == null) 
-			throw new SlangNotFoundException();
+		if (meanings == null)
+			throw new SlangException("Slang " + slang + " doesn't exsit");
 		meanings.add(meaning);
 	}
 
-	public void deleteMeaning(String slang, int pos) throws SlangNotFoundException {
+	public void deleteMeaning(String slang, int pos) throws SlangException {
 		var meanings = data.get(slang);
 		if (meanings == null)
-			throw new SlangNotFoundException();
+			throw new SlangException("Slang " + slang + " doesn't exsit");
 		meanings.remove(pos);
 	}
 
-	public void addSlang(String slang, String[] meanings) throws SlangExistedException {
+	public void addSlang(String slang, Collection<String> meanings) throws SlangException {
 		if (data.get(slang) != null)
-			throw new SlangExistedException();
-		data.put(slang, new ArrayList<>(Arrays.asList(meanings)));
+			throw new SlangException("Slang " + slang + " has already existed");
+		var newMeanings = new ArrayList<String>(meanings.size());
+		for (var meaning: meanings)
+			if (meaning.length() > 0)
+				newMeanings.add(meaning);
+		data.put(slang, newMeanings);
+	}
+
+	public void deleteSlang(String slang) throws SlangException {
+		if (data.remove(slang) == null)
+			throw new SlangException("Slang " + slang + " doesn't exsit");
 	}
 
 	public void reset() throws IOException {
@@ -106,6 +118,7 @@ public class SlangDictionary implements Closeable {
 	public void close() throws IOException {
 		try (var output = new ObjectOutputStream(new FileOutputStream(dataFile))) {
 			output.writeObject(data);
+			System.out.println("Saved data to " + dataFile);
 		}
 	}
 
