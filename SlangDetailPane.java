@@ -20,7 +20,7 @@ public class SlangDetailPane extends JPanel {
 		setLayout(new BorderLayout());
 		setBorder(new EmptyBorder(5, 5, 5, 5));
 
-		slangField = new JTextField("slang");
+		slangField = new JTextField();
 		slangField.setEditable(false);
 		slangField.setFont(new Font(slangField.getFont().getFontName(), Font.BOLD, 30));
 
@@ -31,7 +31,7 @@ public class SlangDetailPane extends JPanel {
 		
 		meaningFields = new ArrayList<JTextField>();
 		for (int i = 0; i < maxMeaning; i++) {
-			var meaningField = new JTextField("Meaning " + i);
+			var meaningField = new JTextField();
 			meaningField.setEditable(false);
 			meaningFields.add(meaningField);
 			meaningPane.add(meaningField);
@@ -42,6 +42,7 @@ public class SlangDetailPane extends JPanel {
 		var buttonPane = new JPanel();
 
 		saveButton = new JButton("Save");
+		saveButton.setEnabled(false);
 		saveButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
