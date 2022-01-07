@@ -55,15 +55,16 @@ public class DictionaryPane extends JPanel {
 
 		add(searchPane, BorderLayout.NORTH);
 
-		var list = new JList<String>(dict.getAllSlangs().toArray(new String[0]));
-		list.addListSelectionListener(new ListSelectionListener() {
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				slangDetailPane.setSlang(list.getSelectedValue());
-			}
-		});
+		// var list = new JList<String>(dict.getAllSlangs().toArray(new String[0]));
+		// list.addListSelectionListener(new ListSelectionListener() {
+		// 	@Override
+		// 	public void valueChanged(ListSelectionEvent e) {
+		// 		slangDetailPane.setSlang(list.getSelectedValue());
+		// 	}
+		// });
 
-		add(new JScrollPane(list), BorderLayout.WEST);
+		// add(new JScrollPane(list), BorderLayout.WEST);
+		
 		add(slangDetailPane, BorderLayout.CENTER);
 	}
 }
