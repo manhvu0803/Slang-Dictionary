@@ -89,7 +89,7 @@ public class SlangDetailPane extends JPanel {
 					if (updateOk) {
 						if (slang != null && slang.length() > 0)
 							dictionary.deleteSlang(slang);
-						clearTextFields();
+						setSlang(null);
 						JOptionPane.showMessageDialog(SlangDetailPane.this, "Deleted!");
 					}
 					deleteButton.setEnabled(false);
@@ -117,7 +117,7 @@ public class SlangDetailPane extends JPanel {
 		addButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				clearTextFields();
+				setSlang(null);
 				changeEditMode(true);
 			}
 		});
@@ -142,12 +142,6 @@ public class SlangDetailPane extends JPanel {
 		this(dict, 3);
 	}
 
-	void clearTextFields() {
-		slangField.setText("");
-		for (var field: meaningFields) 
-			field.setText("");
-	}
-
 	void changeEditMode(boolean edit) {
 		slangField.setEditable(edit);
 		saveButton.setEnabled(edit);
@@ -166,6 +160,13 @@ public class SlangDetailPane extends JPanel {
 	}
 
 	public void setSlang(String slang) {
+		if (slang == null || slang.length() <= 0) {
+			slangField.setText("");
+			for (var field: meaningFields) 
+				field.setText("");
+			return;
+		}
+
 		slangField.setText(slang);
 		deleteButton.setEnabled(true);
 		

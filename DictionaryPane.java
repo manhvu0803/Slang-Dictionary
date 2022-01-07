@@ -1,19 +1,19 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.event.*;
 import java.util.*;
 import java.util.List;
 
 public class DictionaryPane extends JPanel {
 	List<String> searchHistory;
+	SlangDetailPane slangDetailPane;
 
 	public DictionaryPane(SlangDictionary dict) {
 		searchHistory = new ArrayList<>();
 
 		setLayout(new BorderLayout());
 
-		var slangDetailPane = new SlangDetailPane(dict);
+		slangDetailPane = new SlangDetailPane(dict);
 
 		var searchPane = new JPanel(new BorderLayout());
 
@@ -66,5 +66,9 @@ public class DictionaryPane extends JPanel {
 		// add(new JScrollPane(list), BorderLayout.WEST);
 		
 		add(slangDetailPane, BorderLayout.CENTER);
+	}
+
+	public void setSlang(String slang) {
+		slangDetailPane.setSlang(slang);
 	}
 }

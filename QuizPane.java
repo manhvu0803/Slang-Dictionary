@@ -90,6 +90,9 @@ public class QuizPane extends JPanel {
 	 */
 	void newQuiz(int mode) {
 		var quiz = dictionary.getRandomSlangMeaning(4);
+		if (quiz.size() < 4) 
+			return;
+			
 		var generator = new Random();
 		currentAnswer = generator.nextInt(4);
 

@@ -9,10 +9,12 @@ public class SlangDictionary implements Closeable {
 	}
 
 	Map<String, List<String>> data;
+	Map<String, List<String>> fullText;
 	
 	@SuppressWarnings("unchecked")
 	SlangDictionary() throws IOException {
 		data = new TreeMap<String, List<String>>();
+		fullText = new HashMap<String, List<String>>();
 
 		var file = new File(dataFile);
 		if (!file.exists()) {
@@ -23,6 +25,7 @@ public class SlangDictionary implements Closeable {
 		
 		try (var input = new ObjectInputStream(new FileInputStream(file))) {
 			data = (TreeMap<String, List<String>>)input.readObject();
+			fullText = (HashMap<String, List<String>>)input.readObject();
 		}
 		catch (Exception e) {
 			System.err.println("Error while reading " + dataFile + ": " + e.getLocalizedMessage());
@@ -41,9 +44,19 @@ public class SlangDictionary implements Closeable {
 			while ((line = reader.readLine()) != null) {
 				String[] items = line.split("(`|\\| )");
 				if (items.length > 1) {
-					data.put(items[0], new ArrayList<String>(5));
-					for (int i = 1; i < items.length; i++)
-						data.get(items[0]).add(items[i]);
+					var meanings = new ArrayList<String>(3);
+					for (int i = 1; i < items.length; i++) {
+						meanings.add(items[i]);
+						var c = items[i].split("[^A-z0-9]");
+						for (var keyword: c) {
+							keyword = keyword.toUpperCase();
+							if (fullText.get(keyword) == null)
+								fullText.put(keyword, new ArrayList<String>());
+							fullText.get(keyword).add(items[0]);
+						}
+					}
+					data.put(items[0], meanings);
+
 					last = items[0];
 				}
 				else 
@@ -54,6 +67,10 @@ public class SlangDictionary implements Closeable {
 
 	public List<String> getMeanings(String slang) {
 		return data.get(slang);
+	}
+
+	public List<String> getSlangs(String keyword) {
+		return fullText.get(keyword);
 	}
 
 	public Collection<String> getAllSlangs() {
@@ -119,9 +136,27 @@ public class SlangDictionary implements Closeable {
 	@Override
 	public void close() throws IOException {
 		try (var output = new ObjectOutputStream(new FileOutputStream(dataFile))) {
-			output.writeObject(data);
+		 	output.writeObject(data);
+			output.writeObject(fullText);
+		 	output.flush();
+		 	System.out.println("Saved data to " + dataFile);
+		}
+	}
+
+	void writeText() throws IOException {
+		try (var output = new BufferedWriter(new FileWriter("slang.txt"))) {
+			output.write("Slang`Meaning");
+			for (var key: data.keySet()) {
+				output.write("\n" + key + "`");
+				var meanings = data.get(key);
+				for (int i = 0; i < meanings.size(); i++) {
+					if (i > 0)
+						output.write("| ");
+					output.write(meanings.get(i));
+				}
+			}
 			output.flush();
-			System.out.println("Saved data to " + dataFile);
+			System.out.println("Saved data to " + "slang.txt");
 		}
 	}
 
