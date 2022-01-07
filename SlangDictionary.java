@@ -12,7 +12,7 @@ public class SlangDictionary implements Closeable {
 	
 	@SuppressWarnings("unchecked")
 	SlangDictionary() throws IOException {
-		data = new TreeMap<>();
+		data = new TreeMap<String, List<String>>();
 
 		var file = new File(dataFile);
 		if (!file.exists()) {
@@ -26,12 +26,14 @@ public class SlangDictionary implements Closeable {
 		}
 		catch (Exception e) {
 			System.err.println("Error while reading " + dataFile + ": " + e.getLocalizedMessage());
+			e.printStackTrace();
 			System.err.println("\nReading " + defaultFile + " instead");
 			loadDefault();
 		}
 	}
 
-	void loadDefault() throws IOException {
+	public void loadDefault() throws IOException {
+		data = new TreeMap<String, List<String>>();
 		try (var reader = new BufferedReader(new FileReader(defaultFile))) {
 			reader.readLine();
 			String line;
@@ -118,6 +120,7 @@ public class SlangDictionary implements Closeable {
 	public void close() throws IOException {
 		try (var output = new ObjectOutputStream(new FileOutputStream(dataFile))) {
 			output.writeObject(data);
+			output.flush();
 			System.out.println("Saved data to " + dataFile);
 		}
 	}
