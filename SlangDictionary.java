@@ -47,13 +47,7 @@ public class SlangDictionary implements Closeable {
 					var meanings = new ArrayList<String>(3);
 					for (int i = 1; i < items.length; i++) {
 						meanings.add(items[i]);
-						var c = items[i].split("[^A-z0-9]");
-						for (var keyword: c) {
-							keyword = keyword.toUpperCase();
-							if (fullText.get(keyword) == null)
-								fullText.put(keyword, new ArrayList<String>());
-							fullText.get(keyword).add(items[0]);
-						}
+						addKeywords(items[0], items[i]);
 					}
 					data.put(items[0], meanings);
 
@@ -100,6 +94,21 @@ public class SlangDictionary implements Closeable {
 		return slangMap;
 	}
 
+	public void addKeywords(String slang, String meaning) {
+		var c = meaning.split("[^A-z0-9]");
+		for (var keyword: c) {
+			keyword = keyword.toUpperCase();
+			if (fullText.get(keyword) == null)
+				fullText.put(keyword, new ArrayList<String>());
+			fullText.get(keyword).add(slang);
+		}
+	}
+
+	public void addKeywords(String slang, List<String> meanings) {
+		for (var meaning: meanings)
+			addKeywords(slang, meaning);
+	}
+
 	public void addMeaning(String slang, String meaning) throws SlangException {
 		var meanings = data.get(slang);
 		if (meanings == null)
@@ -122,6 +131,7 @@ public class SlangDictionary implements Closeable {
 			if (meaning.length() > 0)
 				newMeanings.add(meaning);
 		data.put(slang, newMeanings);
+		addKeywords(slang, newMeanings);
 	}
 
 	public void deleteSlang(String slang) throws SlangException {
